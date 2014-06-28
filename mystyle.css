@@ -1,60 +1,55 @@
 html
 {
-/*height:100%;
-width:100%*/
+height:100%;
+width:100%
 }
 body
 {
-/*height:100%;
-width:100%*/
+height:100%;
+width:100%
 }
 #top
 {
-/*height:15%;
+height:15%;
 background-image:url('banneri.png');
-background-size:contain;*/
+background-size:contain;
 }
 #banner_text
 {
-/*position:relative;
+position:relative;
 left:35%;
 top:45%;
-font-weight:bold;*/
+font-weight:bold;
 }
 #middle
 {
-/*height:80%;
+height:80%;
 background-image:url('middle_back.jpg');
-background-size:cover;*/
+background-size:cover;
 }
 #bottom
 {
-/*height:5%;
+height:5%;
 background-image:url('bottom_back.png');
-background-size:contain;*/
+background-size:contain;
 }
 #bottom_text
 {
-/*position:relative;
+position:relative;
 left:35%;
 top:35%;
-font-weight:bold;*/
+font-weight:bold;
 }
 
-#textarea
+#main_textbox
 {
-/*height:90%;
+resize:none;
+height:90%;
 width:80%;
 position:relative;
 left:15%;
-top:1%;*/
-}
-#main_textbox
-{
-/*resize:none;
-height:100%;
-width:100%;
-background-color: #E8E8E8;*/
+top:1%;
+background-color: #E8E8E8;
 }
 
 .inlinelist
@@ -67,27 +62,22 @@ padding-right: 20px;
 {
 /*height:5%;
 width:11%;
-position:relative;
+position:relative;*/
 left:84%;
-bottom:1%;*/
+bottom:1%;
 }
 
 #edit
 {
 background-color: #CCFF99;
-/*position:relative;
-bottom:0%;
 -moz-border-radius: 20px;
-border-radius: 3px;*/
+border-radius: 3px;
 }
 
 #save
 {
 background-color:#CCFF99;
-/*position:relative;
-left:12%;
-bottom:0%;
 -moz-border-radius: 20px;
-border-radius: 3px;*/
+border-radius: 3px;
 
 }
