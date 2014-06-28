@@ -1,13 +1,12 @@
 var app = {}; // create namespace for our app
 
 //Helper variables
-app.uid = 0;
+app.id = '0';
 
 //Models
 app.TextArea = Backbone.Model.extend({
       defaults: {
-        text: 'Insert text here!',
-        uid: '0'
+        text: 'Insert text here',
       }
     });
 
@@ -16,10 +15,6 @@ app.TextAreaCollection = Backbone.Collection.extend({
     model: app.TextArea,
     localStorage: new Store("pastie-storage"),
 	initialize: function(){
-		if (this.findWhere({uid: '0'}) === undefined) {
-			console.log("Add initial value");
-			this.add(new app.TextArea());
-		}
 	}
 });
 app.textAreaCollection = new app.TextAreaCollection();
@@ -44,8 +39,9 @@ app.Middle = Backbone.View.extend({
     el: $('#middle'),
     template: _.template("<%= area_text %>"),
     initialize: function(){
-      this.render();
-	  app.textAreaCollection.on('doAction', this.doAction, this);
+	 app.textAreaCollection.on('doAction', this.doAction, this);
+	 app.textAreaCollection.fetch();
+	 this.render();
     },
       render: function(){
 
@@ -57,34 +53,34 @@ app.Middle = Backbone.View.extend({
     },
 	edit: function(){
 	  console.log('Edit clicked!');
-	  app.router.navigate("/edit/"+app.uid,true)
+	  app.router.navigate("/edit/"+app.id,true)
     },
 	save: function(){
-	  app.uid += 1
-	  app.textAreaCollection.add(new app.TextArea({uid: app.uid, text: this.$el.find('#main_textbox').val()}));
+	  app.id = app.textAreaCollection.create(new app.TextArea({text: this.$el.find('#main_textbox').val()})).get('id');
       console.log('Save clicked!');
-	  app.router.navigate("/id/"+app.uid,true)
+	  app.router.navigate("/id/"+app.id,true)
     },
 	
 	doAction: function(){
-	  console.log("doAction"+window.filter);
+	  console.log("doAction: "+window.filter);
 	  this.$el.find('#main_textbox').html('');
 	  switch(window.filter[0]){
           case 'edit':
 		     console.log("Editing...");
-		    if (app.textAreaCollection.findWhere({uid: window.filter[1]})) {
+		    if (app.textAreaCollection.findWhere({id: window.filter[1]})) {
 		      var box = this.$el.find('#main_textbox');
-			  box.html(this.template({area_text: app.textAreaCollection.findWhere({uid: window.filter[1]}).get('text')}));
+			  box.html(this.template({area_text: app.textAreaCollection.findWhere({id: window.filter[1]}).get('text')}));
 			  this.$el.find('#main_textbox').prop('disabled', false);
 			}
 		    
             break;   
 		  case 'id':
 		     console.log("showing...");
-		    if (app.textAreaCollection.findWhere({uid: window.filter[1]})) {
+		    if (app.textAreaCollection.findWhere({id: window.filter[1]})) {
 		      var box = this.$el.find('#main_textbox');
-			  box.html(this.template({area_text: app.textAreaCollection.findWhere({uid: window.filter[1]}).get('text')}));
+			  box.html(this.template({area_text: app.textAreaCollection.findWhere({id: window.filter[1]}).get('text')}));
 			  box.prop('disabled', true);
+			  console.log("Showing end")
 			}
 		    break;
           default:
