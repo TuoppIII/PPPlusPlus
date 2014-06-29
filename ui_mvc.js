@@ -56,8 +56,8 @@ app.Middle = Backbone.View.extend({
 	  app.router.navigate("/edit/"+app.id,true)
     },
 	save: function(){
-	  app.id = app.textAreaCollection.create(new app.TextArea({text: this.$el.find('#main_textbox').val()})).get('id');
       console.log('Save clicked!');
+	  app.id = app.textAreaCollection.create(new app.TextArea({text: this.$el.find('#main_textbox').val()})).get('id');
 	  app.router.navigate("/id/"+app.id,true)
     },
 	
@@ -80,7 +80,6 @@ app.Middle = Backbone.View.extend({
 		      var box = this.$el.find('#main_textbox');
 			  box.html(this.template({area_text: app.textAreaCollection.findWhere({id: window.filter[1]}).get('text')}));
 			  box.prop('disabled', true);
-			  console.log("Showing end")
 			}
 		    break;
           default:
