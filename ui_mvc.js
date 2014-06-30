@@ -63,23 +63,30 @@ app.Middle = Backbone.View.extend({
 	
 	doAction: function(){
 	  console.log("doAction: "+window.filter);
-	  this.$el.find('#main_textbox').html('');
+	  var box = this.$el.find('#main_textbox');
+	  box.html('');
 	  switch(window.filter[0]){
           case 'edit':
 		     console.log("Editing...");
 		    if (app.textAreaCollection.findWhere({id: window.filter[1]})) {
-		      var box = this.$el.find('#main_textbox');
 			  box.html(this.template({area_text: app.textAreaCollection.findWhere({id: window.filter[1]}).get('text')}));
 			  this.$el.find('#main_textbox').prop('disabled', false);
+			}
+			else{
+			  box.html(this.template({area_text: "Insert text here"}));
+			  app.router.navigate("",true)
 			}
 		    
             break;   
 		  case 'id':
 		     console.log("showing...");
 		    if (app.textAreaCollection.findWhere({id: window.filter[1]})) {
-		      var box = this.$el.find('#main_textbox');
 			  box.html(this.template({area_text: app.textAreaCollection.findWhere({id: window.filter[1]}).get('text')}));
 			  box.prop('disabled', true);
+			}
+			else{
+			  box.html(this.template({area_text: "Insert text here"}));
+			  app.router.navigate("",true)
 			}
 		    break;
           default:
