@@ -3,9 +3,11 @@ var http = require('http'),
 	journey = require('journey');
 
 /* Source: http://blog.nodejitsu.com/a-simple-webservice-in-nodejs/ */	
-/* Requires "winston": npm install winston */
+/* Requires "winston" logger: npm install winston */
+/* Requires "journey" router: npm install journey */
 
 /* Testable with http-console: 
+	npm install http-console
 	node.exe node_modules\http-console\bin\http-console localhost:3000 
 	http://localhost:3000/> .j            -----> Changes "Content-Type: application/json"
 	http://localhost:3000/> post piratedpastie
@@ -127,6 +129,6 @@ exports.createRouter = function () {
 
 
 var testobject = { name:'test', version:'1.0'};
-winston.info( "object:" + testobject );
+//winston.info( "object:" + testobject );
 
 exports.createServer(3000);
