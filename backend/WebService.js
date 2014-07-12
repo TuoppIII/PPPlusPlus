@@ -1,10 +1,12 @@
 var http = require('http'),  
     winston = require('winston'), 
-	journey = require('journey');
+	journey = require('journey'),
+	Datastore = require('nedb');
 
 /* Source: http://blog.nodejitsu.com/a-simple-webservice-in-nodejs/ */	
 /* Requires "winston" logger: npm install winston */
 /* Requires "journey" router: npm install journey */
+/* Requires "nodejs-microdb": npm install nedb */
 
 /* Testable with http-console: 
 	npm install http-console
@@ -16,7 +18,8 @@ var http = require('http'),
 	http://localhost:3000/> get piratedpastie/0
 */
 	
-var pastieMessages = new Array(); // Use standard object's associative array as message storage
+//var pastieMessages = new Array(); // Use standard object's associative array as message storage
+var messageDB = new Datastore({ filename: 'PiratedPastie.db', autoload: true });
 
 /**
  * Creates the server for the pinpoint web service
@@ -64,8 +67,10 @@ exports.createRouter = function () {
       // LIST: GET to /bookmarks lists all bookmarks
       //
       this.get().bind(function (req, res) {
-		winston.info("get, number of messages: " + pastieMessages.length);
-		
+		//winston.info("get, number of messages: " + pastieMessages.length);
+		var pastieMessages = messageDB.findAllWithKey("messageID");
+		winston.info("get, number of messages: " + nrOfMessages.length);
+
 		// TODO List all availabe MessageID's of messages
 		var result = "";
 		for ( var i in pastieMessages ) {
@@ -82,8 +87,26 @@ exports.createRouter = function () {
 		winston.info("get with id: " + id);
 		
 		// Return message with given MessageId, if found.
-        res.send(501, {}, { action: 'show', message: pastieMessages[id] });
-      });
+        //res.send(501, {}, { action: 'show', message: pastieMessages[id] });
+		
+		messageDB.count({}, function (err, count) {
+			winston.info("Number of documents: " + count);
+		});
+		
+		messageDB.find( { messageID: id }, function (err, docs) {
+			winston.info("found " + docs.length + " document(s). " + err);
+			winston.info("docs:" + docs + "/" + docs["messageID"]);
+			for ( var doc in docs ) {
+				winston.info("doc:" + doc);
+				winston.info("found:" + docs[doc].length + "/" + docs[doc].messageID + "/" + docs[doc].text);
+			}
+			if ( docs.length > 0 ) {
+				res.send(200, {}, { action: 'show', message: docs[0].text} );
+			} else {
+				res.send(404, {}, { action: 'show' } );
+			}
+		});
+	  });
 
       //
       // CREATE: POST to /bookmarks creates a new bookmark
@@ -96,8 +119,12 @@ exports.createRouter = function () {
 		}
 		
 		// Save new message and return MessageID associated to it
-		var messageID = pastieMessages.length;
-		pastieMessages[ messageID ] = data.text; 
+		//var messageID = pastieMessages.length;
+		//pastieMessages[ messageID ] = data.text; 
+		var messageID = new Date().getTime();
+		var message = { messageID: messageID , text: data.text};
+		messageDB.insert( message );
+		winston.info("message saved with MessageID: " + messageID);
 		
         res.send(200, {}, { action: 'create', messageId: messageID });
       });
