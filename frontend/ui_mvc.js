@@ -6,18 +6,12 @@ app.id = '0';
 //Models
 app.TextArea = Backbone.Model.extend({
       defaults: {
-        text: 'Insert text here',
-      }
+	    "id" : '',
+        "message": 'Insert text here'
+      },
+	  urlRoot: "http://localhost:3000/piratedpastie"
     });
-
-//Collections
-app.TextAreaCollection = Backbone.Collection.extend({
-    model: app.TextArea,
-    localStorage: new Store("pastie-storage"),
-	initialize: function(){
-	}
-});
-app.textAreaCollection = new app.TextAreaCollection();
+app.textArea = new app.TextArea();
 
 // Routes
 app.Router = Backbone.Router.extend({
@@ -28,7 +22,7 @@ app.Router = Backbone.Router.extend({
 	    if(params != null){
 			console.log('app.router.params = ' + params); // just for didactical purposes.
 			window.filter = params.trim().split('/') || [];
-			app.textAreaCollection.trigger('doAction');
+			app.textArea.trigger('doAction');
 		}
       }
     });
@@ -39,12 +33,12 @@ app.Middle = Backbone.View.extend({
     el: $('#middle'),
     template: _.template("<%= area_text %>"),
     initialize: function(){
-	 app.textAreaCollection.on('doAction', this.doAction, this);
-	 app.textAreaCollection.fetch();
+	 app.textArea.on('doAction', this.doAction, this);
 	 this.render();
     },
-      render: function(){
-
+    render: function(){
+	  console.log("rendering")
+	  this.$el.find('#main_textbox').html(this.template({area_text: app.textArea.get('message')}));
     },
 	  
 	events: {
@@ -53,51 +47,45 @@ app.Middle = Backbone.View.extend({
     },
 	edit: function(){
 	  console.log('Edit clicked!');
-	  app.router.navigate("/edit/"+app.id,true)
+	  app.router.navigate("/edit/"+app.textArea.id,true)
     },
 	save: function(){
       console.log('Save clicked!');
-	  app.id = app.textAreaCollection.create(new app.TextArea({text: this.$el.find('#main_textbox').val()})).get('id');
-	  app.router.navigate("/id/"+app.id,true)
+	  console.log(app.textArea.save({"message": this.$el.find('#main_textbox').val()}));
+	  app.router.navigate("/id/"+app.textArea.id,true)
     },
 	
 	doAction: function(){
 	  console.log("doAction: "+window.filter);
 	  var box = this.$el.find('#main_textbox');
 	  box.html('');
+	  app.textArea.clear();
+	  app.textArea.set('id', window.filter[1]);
+	  var _thisView = this;
+	  app.textArea.fetch({
+	    success: function (model, response, options) {
+		  _thisView.render();
+		},
+		error: function (model, response, options) {
+		  app.textArea.set('message',"Failed to retrieve text with id: "+app.textArea.id+"!");
+		  box.prop('disabled', false);
+		  _thisView.render();
+		  //app.router.navigate("",true);
+		},
+      });
 	  switch(window.filter[0]){
           case 'edit':
-		     console.log("Editing...");
-		    if (app.textAreaCollection.findWhere({id: window.filter[1]})) {
-			  box.html(this.template({area_text: app.textAreaCollection.findWhere({id: window.filter[1]}).get('text')}));
-			  this.$el.find('#main_textbox').prop('disabled', false);
-			}
-			else{
-			  box.html(this.template({area_text: "Insert text here"}));
-			  app.router.navigate("",true)
-			}
-		    
+		    console.log("Editing...");
+			box.prop('disabled', false);
             break;   
 		  case 'id':
-		     console.log("showing...");
-		    if (app.textAreaCollection.findWhere({id: window.filter[1]})) {
-			  box.html(this.template({area_text: app.textAreaCollection.findWhere({id: window.filter[1]}).get('text')}));
-			  box.prop('disabled', true);
-			}
-			else{
-			  box.html(this.template({area_text: "Insert text here"}));
-			  app.router.navigate("",true)
-			}
+		    console.log("showing...");
+			box.prop('disabled', true);
 		    break;
           default:
             break;
       }
-	},
-	
-	setText: function(boolean) {
-	
-	}
-	
+	}	
 });
 
 Backbone.history.start();
