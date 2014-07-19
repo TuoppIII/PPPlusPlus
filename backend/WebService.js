@@ -17,7 +17,7 @@ var http = require('http'),
 	http://localhost:3000/> get piratedpastie
 	http://localhost:3000/> get piratedpastie/0
 */
-	
+
 //var pastieMessages = new Array(); // Use standard object's associative array as message storage
 var messageDB = new Datastore({ filename: 'PiratedPastie.db', autoload: true });
 
@@ -68,16 +68,19 @@ exports.createRouter = function () {
       //
       this.get().bind(function (req, res) {
 		//winston.info("get, number of messages: " + pastieMessages.length);
-		var pastieMessages = messageDB.findAllWithKey("messageID");
-		winston.info("get, number of messages: " + nrOfMessages.length);
-
-		// TODO List all availabe MessageID's of messages
-		var result = "";
-		for ( var i in pastieMessages ) {
-			result += "" + i + ", ";
-		}
+		messageDB.find({}, function (err, docs) {
+			winston.info("get, number of messages: " + docs.length);
+			var result = "";
+			for ( var doc in docs ) {
+				result += "" +docs[doc].messageID + ", ";
+			}
+			if ( docs.length > 0 ) {
+				res.send(200, {}, { action: 'list', data: result} );
+			} else {
+				res.send(404, {}, { action: 'list' } );
+			}
+		});
 		
-        res.send(200, {}, { action: 'list', data : result });
       });
 
       //
@@ -158,4 +161,4 @@ exports.createRouter = function () {
 var testobject = { name:'test', version:'1.0'};
 //winston.info( "object:" + testobject );
 
-exports.createServer(3000);
+exports.createServer(30001);
