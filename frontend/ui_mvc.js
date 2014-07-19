@@ -9,7 +9,7 @@ app.TextArea = Backbone.Model.extend({
 	    "id" : '',
         "message": 'Insert text here'
       },
-	  urlRoot: "http://localhost:3000/piratedpastie"
+	  urlRoot: "http://sbill.kapsi.fi/pirated_pastie/"
     });
 app.textArea = new app.TextArea();
 
