@@ -1,4 +1,7 @@
 var http = require('http'),  
+	url = require('url'), 
+	fs = require('fs'),
+	path = require('path');
     winston = require('winston'), 
 	journey = require('journey'),
 	Datastore = require('nedb');
@@ -10,7 +13,7 @@ var http = require('http'),
 
 /* Testable with http-console: 
 	npm install http-console
-	node.exe node_modules\http-console\bin\http-console localhost:3000 
+	node.exe node_modules\http-console\bin\http-console localhost:30001 
 	http://localhost:3000/> .j            -----> Changes "Content-Type: application/json"
 	http://localhost:3000/> post piratedpastie
 	... { "text":"Test text for Pirated Pastie" }
@@ -41,17 +44,49 @@ exports.createServer = function (port) {
 	  //
 	  // Dispatch the request to the router
 	  //
-	  winston.info("body: " + body);
-	  router.handle(request, body, function (result) {
-		response.writeHead(result.status, result.headers);
-		response.end(result.body);
-	  });
+	  //winston.info("body: " + body);
+	  winston.info( url.parse(request.url).pathname );
+	  
+	  if ( request.url.match(/piratedpastie/) ) {
+		// Handle Web Service request
+		  router.handle(request, body, function (result) {
+			response.writeHead(result.status, result.headers);
+			response.end(result.body);
+		  });
+	  } else {
+		// Serve static html pages from ../frontend -directory
+		var uri = url.parse(request.url).pathname
+			, filename = path.join(process.cwd(), '..\\frontend', uri);
+		
+		winston.info("Serve page: " + uri);
+		
+		path.exists(filename, function(exists) {
+			if(!exists) {
+				response.writeHead(404, {"Content-Type": "text/plain"});
+				response.write("404 Not Found\n");
+				response.end();
+				return;
+			}
+ 
+			if (fs.statSync(filename).isDirectory()) filename += '/index.html';
+ 
+			fs.readFile(filename, "binary", function(err, file) {
+				if(err) {        
+					response.writeHead(500, {"Content-Type": "text/plain"});
+					response.write(err + "\n");
+					response.end();
+					return;
+				}
+ 
+				response.writeHead(200);
+				response.write(file, "binary");
+				response.end();
+			});
+		});
+	  }
 	});
-
-    //response.writeHead(501, { 'Content-Type': 'application/json' });
-    //response.end(JSON.stringify({ message: 'not implemented!' }));
   });
-
+  
   if (port) {
     server.listen(port);
   }
@@ -61,7 +96,7 @@ exports.createServer = function (port) {
 
 exports.createRouter = function () {  
 	var router = new (journey.Router)( { strict: false } );
-  
+    
     router.path(/\/piratedpastie/, function () {
       //
       // LIST: GET to /bookmarks lists all bookmarks
@@ -154,6 +189,7 @@ exports.createRouter = function () {
         res.send(501, {}, { action: 'delete' });
       });
     });
+	
 	return router;
 };
 
