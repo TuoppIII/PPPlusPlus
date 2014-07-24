@@ -24,6 +24,12 @@ var http = require('http'),
 //var pastieMessages = new Array(); // Use standard object's associative array as message storage
 var messageDB = new Datastore({ filename: 'PiratedPastie.db', autoload: true });
 
+var contentTypesByExtension = {
+	'.html': "text/html",
+	'.css':  "text/css",
+	'.js':   "text/javascript"
+};
+
 /**
  * Creates the server for the pinpoint web service
  * @param {int} port: Port for the server to run on
@@ -78,7 +84,10 @@ exports.createServer = function (port) {
 					return;
 				}
  
-				response.writeHead(200, {'Content-Type': 'text/plain'});
+				var headers = {};
+				var contentType = contentTypesByExtension[path.extname(filename)];
+				if (contentType) headers["Content-Type"] = contentType;
+				response.writeHead(200, headers);
 				response.write(file, "binary");
 				response.end();
 			});
