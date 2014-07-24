@@ -78,7 +78,7 @@ exports.createServer = function (port) {
 					return;
 				}
  
-				response.writeHead(200);
+				response.writeHead(200, {'Content-Type': 'text/plain'});
 				response.write(file, "binary");
 				response.end();
 			});
