@@ -9,7 +9,7 @@ app.TextArea = Backbone.Model.extend({
 	    "id" : '',
         "message": 'Insert text here'
       },
-	  urlRoot: "http://sbill.kapsi.fi/pirated_pastie/"
+	  urlRoot: "http://sbill.kapsi.fi/pirated_pastie/piratedpastie" 
     });
 app.textArea = new app.TextArea();
 
@@ -52,6 +52,7 @@ app.Middle = Backbone.View.extend({
 	save: function(){
       console.log('Save clicked!');
 	  console.log(app.textArea.save({"message": this.$el.find('#main_textbox').val()}));
+
 	  app.router.navigate("/id/"+app.textArea.id,true)
     },
 	
