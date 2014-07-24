@@ -56,11 +56,11 @@ exports.createServer = function (port) {
 	  } else {
 		// Serve static html pages from ../frontend -directory
 		var uri = url.parse(request.url).pathname
-			, filename = path.join(process.cwd(), '..\\frontend', uri);
+			, filename = path.join(process.cwd(), '../frontend', uri);
 		
 		winston.info("Serve page: " + uri);
 		
-		path.exists(filename, function(exists) {
+		fs.exists(filename, function(exists) {
 			if(!exists) {
 				response.writeHead(404, {"Content-Type": "text/plain"});
 				response.write("404 Not Found\n");
