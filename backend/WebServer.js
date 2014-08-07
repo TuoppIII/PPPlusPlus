@@ -169,7 +169,7 @@ exports.createRouter = function () {
 		//var messageID = pastieMessages.length;
 		//pastieMessages[ messageID ] = data.text; 
 		var messageID = new Date().getTime();
-		var message = { messageID: messageID , text: data.text};
+		var message = { messageID: messageID , text: data.message};
 		messageDB.insert( message );
 		winston.info("message saved with MessageID: " + messageID);
 		
