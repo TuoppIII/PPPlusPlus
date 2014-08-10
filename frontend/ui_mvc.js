@@ -18,7 +18,7 @@ app.Middle = Backbone.View.extend({
   },
   render: function(){
     console.log("rendering")
-    this.$el.find('#main_textbox').html(app.textArea.get('message'));
+    this.$el.find('#textbox').html(app.textArea.get('message'));
   },
 
   events: {
@@ -31,7 +31,7 @@ app.Middle = Backbone.View.extend({
   },
   save: function(){
     console.log('Save clicked! ');
-	app.textArea = new app.TextArea({message: this.$el.find('#main_textbox').val()});
+	app.textArea = new app.TextArea({message: this.$el.find('#textbox').val()});
     app.textArea.save({message: app.textArea.get('message')},{
 	  success: function (model, response, options) {
 		app.router.navigate("/id/"+app.textArea.get('messageId'),true)
@@ -44,7 +44,7 @@ app.Middle = Backbone.View.extend({
   
   doAction: function(){
     console.log("doAction: "+window.filter);
-    var box = this.$el.find('#main_textbox');
+    var box = this.$el.find('#textbox');
     //box.html('');
     app.textArea = new app.TextArea({messageId: window.filter[1]});
     var _thisView = this;

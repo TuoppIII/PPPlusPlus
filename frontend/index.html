@@ -1,35 +1,42 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+  <head name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
 	 <!-- Bootstrap core CSS -->
     <link href="./lib/bootstrap-3.2.0-dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap theme -->
     <link href="./lib/bootstrap-3.2.0-dist/css/bootstrap-theme.min.css" rel="stylesheet">
 	<!-- First use the bootsrap and then add your own. -->
-	<!-- <link rel="stylesheet" type="text/css" href="mystyle.css"> -->
+	<link rel="stylesheet" type="text/css" href="mystyle.css">
     <title>hello-backbonejs</title>
   </head>
   <body>
-    <div id="top">
-			<p id="banner_text"><h2>This is the Pirated Pastie Banner<h2></p>
+	<div class="site-wrapper">
+		<div class="site-wrapper-inner">
+			<div class="cover-container">
+				<div class="masthead clearfix">
+					<div class="inner">
+						<h2 class="masthead-brand">This is the Pirated Pastie</h2>
+					</div>
+				</div>
+				<div id="middle" class="inner cover">
+					<textarea id="textbox" style="width: 710px; height: 224px;"></textarea>
+					<ul class="buttons">
+						<li class="inlinelist"><button id="edit" class="btn btn-success btn-sm">Edit</button></li>
+						<li class="inlinelist"><button id="save" class="btn btn-primary btn-sm">Save</button></li>
+					</ul>
+				</div>
+				<div id="bottom" class="mastfoot">
+					<div class="inner">
+						<p id="bottom_text">Contact info: Do not contact us!!</p>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
-	<div id="middle">
-	    <textarea id="main_textbox"></textarea>
-	    <ul id="buttons">
-		  <li class="inlinelist"><button id="edit">Edit</button></li>
-		  <li class="inlinelist"><button id="save">Save</button></li>
-		</ul>
-	</div>
-	<div id="bottom">
-		<p id="bottom_text">Here we could have some contact info</p>
-	</div>
-	
     <script src="./lib/jquery.min.js" type="text/javascript"></script>
-    <!-- <script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js" type="text/javascript"></script> -->
     <script src="./lib/underscore-min.js" type="text/javascript"></script>
     <script src="./lib/backbone-min.js" type="text/javascript"></script> 
-    <!-- <script src="./lib/backbone.localStorage-min.js" type="text/javascript"></script>  -->
 	<script src="./lib/bootstrap-3.2.0-dist/js/bootstrap.min.js"></script>
 	<script src="ui_mvc.js" type="text/javascript"></script>
   </body>
