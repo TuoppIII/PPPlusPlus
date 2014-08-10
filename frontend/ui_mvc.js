@@ -45,7 +45,7 @@ app.Middle = Backbone.View.extend({
   doAction: function(){
     console.log("doAction: "+window.filter);
     var box = this.$el.find('#textbox');
-    box.val('');
+    //box.val('');
     app.textArea = new app.TextArea({messageId: window.filter[1]});
     var _thisView = this;
     app.textArea.fetch({
