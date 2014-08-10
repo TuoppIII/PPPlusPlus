@@ -69,7 +69,7 @@ app.Middle = Backbone.View.extend({
         app.textArea.set('message',"Failed to retrieve text with id: "+app.textArea.id+"!");
 		_thisView.render();
         box.prop('disabled', false);
-        //app.router.navigate("",true);
+        app.router.navigate("/",true);
       },
     });
   }

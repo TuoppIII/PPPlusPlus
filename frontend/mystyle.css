@@ -43,7 +43,7 @@ top:45%;
 * Cover
 */
 .cover {
-padding: 0 20px;
+padding: 0px;
 }
 /*
 * Footer
@@ -80,11 +80,17 @@ width: 100%; /* Must be percentage or pixels for horizontal alignment */
 .masthead,
 .mastfoot,
 .cover-container {
-width: 700px;
+width: 85%;
+}
+.cover{
+height: 800px;
 }
 }
 #textbox
 {
+font-size:16px;
+width: 100%;
+height: 80%;
 color: #000;
 }
 .inlinelist
@@ -94,6 +100,6 @@ list-style-type: none;
 }
 .buttons
 {
-position:relative;
-left:75%;
+width: 200px;
+margin-left: auto;
 }
