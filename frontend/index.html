@@ -1,41 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
 	 <!-- Bootstrap core CSS -->
     <link href="./lib/bootstrap-3.2.0-dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap theme -->
     <link href="./lib/bootstrap-3.2.0-dist/css/bootstrap-theme.min.css" rel="stylesheet">
 	<!-- First use the bootsrap and then add your own. -->
-	<link rel="stylesheet" type="text/css" href="mystyle.css">
-    <title>hello-backbonejs</title>
+	<link rel="stylesheet" type="text/css" href="mystyle_grid.css">
+    <title>Pirated Pastie</title>
   </head>
   <body>
-	<div class="site-wrapper">
-		<div class="site-wrapper-inner">
-			<div class="cover-container">
-				<div class="masthead clearfix">
-					<div class="inner">
-						<h2 class="masthead-brand">This is Pirated Pastie!</h2>
-					</div>
-				</div>
-				<div id="middle" class="inner cover">
-					<textarea id="textbox"></textarea>
-					<ul class="buttons">
-						<li class="inlinelist"><button id="edit" class="btn btn-success btn-lg">Edit</button></li>
-						<li class="inlinelist"><button id="save" class="btn btn-primary btn-lg">Save</button></li>
-					</ul>
-				</div>
-				<div id="bottom" class="mastfoot">
-					<div class="inner">
-						<p id="bottom_text">Contact info: Do not contact us!!</p>
-					</div>
-				</div>
+	<div class="panel panel-default fill bgcolor">
+		<h1 class="panel-title text-center bgcolor" >This is Pirated Pastie!</h1>
+		<div class="panel-body fill-body bgcolor">
+			<textarea id="textbox"></textarea>
+			<div class="col-xs-8">
+			</div>
+			<div class="col-xs-4">
+				<ul>
+					<li class="inlinelist"><button id="edit" class="btn btn-success btn-lg">Edit</button></li>
+					<li class="inlinelist"><button id="save" class="btn btn-primary btn-lg">Save</button></li>
+				</ul>
 			</div>
 		</div>
+		<div class="panel-footer bgcolor">			
+			<p class="text-center" id="bottom_text">Contact info: Do not contact us!!</p>
+		</div>
 	</div>
-    <script src="./lib/jquery.min.js" type="text/javascript"></script>
-    <script src="./lib/underscore-min.js" type="text/javascript"></script>
+	<script src="./lib/jquery.min.js" type="text/javascript"></script>
+	<script src="./lib/underscore-min.js" type="text/javascript"></script>
     <script src="./lib/backbone-min.js" type="text/javascript"></script> 
 	<script src="./lib/bootstrap-3.2.0-dist/js/bootstrap.min.js"></script>
 	<script src="ui_mvc.js" type="text/javascript"></script>

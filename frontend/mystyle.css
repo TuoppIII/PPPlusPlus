@@ -1,96 +1,20 @@
-html,
-body
-{
-height:100%;
-background-color: #333;
+html, body {
+    height: 100%;
+	background-color: #333;
 }
 body{
-color: #fff;
+	
 }
 /* Extra markup and styles for table-esque vertical and horizontal centering */
-.site-wrapper {
-display: table;
-width: 100%;
-height: 100%; /* For at least Firefox */
-min-height: 100%;
--webkit-box-shadow: inset 0 0 100px rgba(0,0,0,.5);
-box-shadow: inset 0 0 100px rgba(0,0,0,.5);
-}
-.site-wrapper-inner {
-display: table-cell;
-vertical-align: top;
-}
-.cover-container {
-margin-right: auto;
-margin-left: auto;
-}
-/* Padding for spacing */
-.inner {
-padding: 30px;
-}
 
-/*
-* Header
-*/
-.masthead-brand {
-margin-top: 10px;
-margin-bottom: 10px;
-position:relative;
-left:25%;
-top:45%;
-}
-/*
-* Cover
-*/
-.cover {
-padding: 0px;
-}
-/*
-* Footer
-*/
-.mastfoot {
-color: #999; /* IE8 proofing */
-color: rgba(255,255,255,.5);
-}
 /*
 * Affix and center
 */
-@media (min-width: 768px) {
-/* Pull out the header and footer */
-.masthead {
-position: fixed;
-top: 0;
-}
-.mastfoot {
-position: fixed;
-bottom: 0;
-}
-/* Start the vertical centering */
-.site-wrapper-inner {
-vertical-align: middle;
-}
-/* Handle the widths */
-.masthead,
-.mastfoot,
-.cover-container {
-width: 100%; /* Must be percentage or pixels for horizontal alignment */
-}
-}
-@media (min-width: 992px) {
-.masthead,
-.mastfoot,
-.cover-container {
-width: 85%;
-}
-.cover{
-height: 800px;
-}
-}
 #textbox
 {
-font-size:16px;
 width: 100%;
-height: 80%;
+height: 90%;
+font-size:16px;
 color: #000;
 }
 .inlinelist
@@ -102,4 +26,22 @@ list-style-type: none;
 {
 width: 200px;
 margin-left: auto;
+}
+
+.fill { 
+height: 100%;
+}
+.fill-body { 
+height: 90%;
+}
+.bgcolor {
+background-color: #333;
+color: #fff;
+}
+.panel-default > .panel-footer {
+bottom: 0;
+border: 0;
+}
+.panel {
+    border: 0;
 }
