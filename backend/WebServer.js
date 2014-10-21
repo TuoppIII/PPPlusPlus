@@ -16,7 +16,7 @@ var http = require('http'),
 	node.exe node_modules\http-console\bin\http-console localhost:30001 
 	http://localhost:3000/> .j            -----> Changes "Content-Type: application/json"
 	http://localhost:3000/> post piratedpastie
-	... { "text":"Test text for Pirated Pastie" }
+	... { "message":"Test text for Pirated Pastie" }
 	http://localhost:3000/> get piratedpastie
 	http://localhost:3000/> get piratedpastie/0
 */
@@ -111,7 +111,6 @@ exports.createRouter = function () {
       // LIST: GET to /bookmarks lists all bookmarks
       //
       this.get().bind(function (req, res) {
-		//winston.info("get, number of messages: " + pastieMessages.length);
 		messageDB.find({}, function (err, docs) {
 			winston.info("get, number of messages: " + docs.length);
 			var result = "";
@@ -134,7 +133,6 @@ exports.createRouter = function () {
 		winston.info("get with id: " + id);
 		
 		// Return message with given MessageId, if found.
-        //res.send(501, {}, { action: 'show', message: pastieMessages[id] });
 		
 		messageDB.count({}, function (err, count) {
 			winston.info("Number of documents: " + count);
@@ -148,7 +146,7 @@ exports.createRouter = function () {
 				winston.info("found:" + docs[doc].length + "/" + docs[doc].messageID + "/" + docs[doc].text);
 			}
 			if ( docs.length > 0 ) {
-				res.send(200, {}, { action: 'show', message: docs[0].text} );
+				res.send(200, {}, { action: 'show', message: docs[0].text, created: docs[0].created} );
 			} else {
 				res.send(404, {}, { action: 'show' } );
 			}
@@ -166,14 +164,14 @@ exports.createRouter = function () {
 		}
 		
 		// Save new message and return MessageID associated to it
-		//var messageID = pastieMessages.length;
-		//pastieMessages[ messageID ] = data.text; 
-		var messageID = new Date().getTime();
-		var message = { messageID: messageID , text: data.message};
-		messageDB.insert( message );
-		winston.info("message saved with MessageID: " + messageID);
-		
-        res.send(200, {}, { action: 'create', messageId: messageID });
+		var messageID = new Date().getTime(); // TODO There is a slight possibility for two messages to receive same ID. Use something unique from the request as part of the key as well?
+		var createdDate = new Date().getTime();
+		var message = { messageID: messageID, text: data.message, created: createdDate};
+		winston.info( "message: " + message ); 
+		messageDB.insert( message, function (err, newDoc) { 
+			winston.info("message saved with MessageID: " + newDoc.messageID + "/" + newDoc._id);
+			res.send(200, {}, { action: 'create', messageId: newDoc.messageID, id:  newDoc._id} );
+		});
       });
 
       //

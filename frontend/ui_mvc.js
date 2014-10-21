@@ -6,7 +6,8 @@ app.TextArea = Backbone.Model.extend({
   "message": 'Insert text here!'
   },
   idAttribute:"messageId",
-  urlRoot: "/piratedpastie"
+  urlRoot: "/piratedpastie",
+  created: ""
 });
 app.textArea = new app.TextArea();
 
@@ -19,6 +20,8 @@ app.Middle = Backbone.View.extend({
   render: function(){
     console.log("rendering")
     this.$el.find('#textbox').val(app.textArea.get('message'));
+	this.$el.find('#last_edited').text( "Last edited: " + 
+		new Date(app.textArea.get('created')).toLocaleDateString() + " " + new Date(app.textArea.get('created')).toLocaleTimeString() );
   },
 
   events: {
@@ -50,7 +53,7 @@ app.Middle = Backbone.View.extend({
     var _thisView = this;
     app.textArea.fetch({
       success: function (model, response, options) {
-	     console.log("model: "+model+", response: "+response+", options: "+options);
+	     console.log("model: " + model + ", response: " + response + ", options: " + options);
 		_thisView.render();
         switch(window.filter[0]){
           case 'edit':
