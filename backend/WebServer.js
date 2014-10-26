@@ -146,7 +146,7 @@ exports.createRouter = function () {
 				winston.info("found:" + docs[doc].length + "/" + docs[doc].messageID + "/" + docs[doc].text);
 			}
 			if ( docs.length > 0 ) {
-				res.send(200, {}, { action: 'show', message: docs[0].text, created: docs[0].created} );
+				res.send(200, {}, { action: 'show', message: docs[0].text, created: docs[0].created, oldId: docs[0].oldId} );
 			} else {
 				res.send(404, {}, { action: 'show' } );
 			}
@@ -166,7 +166,7 @@ exports.createRouter = function () {
 		// Save new message and return MessageID associated to it
 		var messageID = new Date().getTime(); // TODO There is a slight possibility for two messages to receive same ID. Use something unique from the request as part of the key as well?
 		var createdDate = new Date().getTime();
-		var message = { messageID: messageID, text: data.message, created: createdDate};
+		var message = { messageID: messageID, text: data.message, created: createdDate, oldId: data.oldId};
 		winston.info( "message: " + message ); 
 		messageDB.insert( message, function (err, newDoc) { 
 			winston.info("message saved with MessageID: " + newDoc.messageID + "/" + newDoc._id);

@@ -17,6 +17,10 @@ height: 90%;
 font-size:16px;
 color: #000;
 }
+#previous
+{
+display: none;
+}
 .inlinelist
 {
 display: inline;
