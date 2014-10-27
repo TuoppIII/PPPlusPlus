@@ -5,7 +5,7 @@ app.TextArea = Backbone.Model.extend({
   defaults: {
 	"message": 'Insert text here!',
 	"created": '',
-	"oldId": ''
+	"oldId": '',
   },
   idAttribute:"messageId",
   urlRoot: "/piratedpastie",
@@ -14,12 +14,20 @@ app.textArea = new app.TextArea();
 
 //Views
 app.Middle = Backbone.View.extend({
+  justSaved: false,
   el: $('#middle'),
   initialize: function(){
     this.render();
   },
   render: function(){
-    console.log("rendering")
+    console.log("rendering");
+	if(!this.justSaved){
+		this.$el.find('#feedback').text("");
+	}
+	else if(this.justSaved){
+		this.$el.find('#feedback').text("Save successful! Text id: " + app.textArea.get('messageId'));
+		this.justSaved = false;
+	}
     this.$el.find('#textbox').val(app.textArea.get('message'));
 	this.$el.find('#previous').val(app.textArea.get('oldId'));
 	this.$el.find('#last_edited').text( "Last edited: " + 
@@ -40,6 +48,7 @@ app.Middle = Backbone.View.extend({
 	app.textArea = new app.TextArea({message: this.$el.find('#textbox').val(), oldId: app.textArea.get("messageId")});
     app.textArea.save({message: app.textArea.get('message')},{
 	  success: function (model, response, options) {
+		app.middle.justSaved = true;
 		app.router.navigate("/id/"+app.textArea.get('messageId'),true)
       },
       error: function (model, response, options) {
