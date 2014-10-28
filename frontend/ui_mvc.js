@@ -28,7 +28,7 @@ app.Middle = Backbone.View.extend({
 		this.$el.find('#feedback').text("Save successful! Text id: " + app.textArea.get('messageId'));
 		this.justSaved = false;
 	}
-    this.$el.find('#textbox').val(app.textArea.get('message'));
+	this.$el.find('#textbox').html(app.textArea.get('message'));
 	this.$el.find('#previous').val(app.textArea.get('oldId'));
 	this.$el.find('#last_edited').text( "Last edited: " + 
 		new Date(app.textArea.get('created')).toLocaleDateString() + " " + new Date(app.textArea.get('created')).toLocaleTimeString() );
@@ -45,7 +45,7 @@ app.Middle = Backbone.View.extend({
   },
   save: function(){
     console.log('Save clicked! ');
-	app.textArea = new app.TextArea({message: this.$el.find('#textbox').val(), oldId: app.textArea.get("messageId")});
+	app.textArea = new app.TextArea({message: this.$el.find('#textbox').html(), oldId: app.textArea.get("messageId")});
     app.textArea.save({message: app.textArea.get('message')},{
 	  success: function (model, response, options) {
 		app.middle.justSaved = true;
@@ -64,7 +64,6 @@ app.Middle = Backbone.View.extend({
   doAction: function(){
     console.log("doAction: "+window.filter);
     var box = this.$el.find('#textbox');
-    //box.val('');
     app.textArea = new app.TextArea({messageId: window.filter[1]});
     var _thisView = this;
     app.textArea.fetch({
@@ -74,7 +73,7 @@ app.Middle = Backbone.View.extend({
         switch(window.filter[0]){
           case 'edit':
             console.log("Editing...");
-            box.prop('disabled', false);
+            box.attr('contentEditable',true);
 			if(app.textArea.get('oldId') != ""){
 				app.middle.$el.find('#previous').show();
 			}
@@ -85,7 +84,7 @@ app.Middle = Backbone.View.extend({
             break;   
           case 'id':
             console.log("showing...");
-            box.prop('disabled', true);
+            box.attr('contentEditable', false);
 			if(app.textArea.get('oldId') != ""){
 				app.middle.$el.find('#previous').show();
 			}
@@ -102,7 +101,7 @@ app.Middle = Backbone.View.extend({
         app.textArea.set('message',"Failed to retrieve text with id: "+app.textArea.id+"!");
 		app.textArea = new app.TextArea();
 		_thisView.render();
-        box.prop('disabled', false);
+        box.attr('contentEditable', true);
         app.router.navigate("/",true);
       },
     });
