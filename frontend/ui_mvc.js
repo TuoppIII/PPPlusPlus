@@ -15,18 +15,23 @@ app.textArea = new app.TextArea();
 //Views
 app.Middle = Backbone.View.extend({
   justSaved: false,
+  msgTooLarge: false,
   el: $('#middle'),
   initialize: function(){
     this.render();
   },
   render: function(){
     console.log("rendering");
-	if(!this.justSaved){
+	if(!this.justSaved && !this.msgTooLarge){
 		this.$el.find('#feedback').text("");
 	}
 	else if(this.justSaved){
 		this.$el.find('#feedback').text("Save successful! Text id: " + app.textArea.get('messageId'));
 		this.justSaved = false;
+	}
+	else if(this.msgTooLarge){
+		this.$el.find('#error').text("Message size too large. Allowed size 5Mb." );
+		this.msgTooLarge = false;
 	}
 	this.$el.find('#textbox').html(app.textArea.get('message'));
 	this.$el.find('#previous').val(app.textArea.get('oldId'));
@@ -45,16 +50,24 @@ app.Middle = Backbone.View.extend({
   },
   save: function(){
     console.log('Save clicked! ');
-	app.textArea = new app.TextArea({message: this.$el.find('#textbox').html(), oldId: app.textArea.get("messageId")});
-    app.textArea.save({message: app.textArea.get('message')},{
-	  success: function (model, response, options) {
-		app.middle.justSaved = true;
-		app.router.navigate("/id/"+app.textArea.get('messageId'),true)
-      },
-      error: function (model, response, options) {
-        app.textArea.set('message',"Failed to save text to server!!\n\n"+ app.textArea.get('message'));
-      },
-	});
+	//Check size is smaller than 10MB
+	if(encodeURIComponent(this.$el.find('#textbox').html()).replace(/%[A-F\d]{2}/g, 'U').length < 5000000){
+	    app.textArea = new app.TextArea({message: this.$el.find('#textbox').html(), oldId: app.textArea.get("messageId")});
+	    app.textArea.save({message: app.textArea.get('message')},{
+	    	success: function (model, response, options) {
+			app.middle.justSaved = true;
+			app.router.navigate("/id/"+app.textArea.get('messageId'),true)
+	    	},
+		error: function (model, response, options) {
+       	 		app.textArea.set('message',"Failed to save text to server!!\n\n"+ app.textArea.get('message'));
+	    	},
+	    });
+	}
+	else{
+		console.log('Too Large! ');
+		app.middle.msgTooLarge = true;
+		this.render();
+	}
   },
   previous: function(){
     console.log('previous clicked!');

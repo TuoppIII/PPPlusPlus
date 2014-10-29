@@ -17,10 +17,16 @@ height: 90%;
 font-size:16px;
 color: #000;
 background-color: #FFF;
+overflow-y: auto;
+overflow-x: hidden;
 }
 #previous
 {
 display: none;
+}
+#error
+{
+color: #F00;
 }
 .inlinelist
 {
