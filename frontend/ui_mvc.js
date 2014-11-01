@@ -26,6 +26,8 @@ app.Title = Backbone.View.extend({
 	title_button: function(){
 		console.log("title clicked");
 		app.middle.$el.find('#textbox').text("Insert text here!");
+		app.middle.$el.find('#previous').hide();
+		app.middle.$el.find('#feedback').text("");
 		app.router.navigate("",true);
 	},
 });
