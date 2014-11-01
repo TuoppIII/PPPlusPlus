@@ -13,6 +13,23 @@ app.TextArea = Backbone.Model.extend({
 app.textArea = new app.TextArea();
 
 //Views
+app.Title = Backbone.View.extend({
+	el: $('#title'),
+	initialize: function(){
+		this.render();
+	},
+	render: function(){
+	},
+	events: {
+		'click #title_button' : 'title_button'
+	},
+	title_button: function(){
+		console.log("title clicked");
+		app.middle.$el.find('#textbox').text("Insert text here!");
+		app.router.navigate("",true);
+	},
+});
+
 app.Middle = Backbone.View.extend({
   justSaved: false,
   msgTooLarge: false,
@@ -21,7 +38,6 @@ app.Middle = Backbone.View.extend({
     this.render();
   },
   render: function(){
-    console.log("rendering");
 	if(!this.justSaved && !this.msgTooLarge){
 		this.$el.find('#feedback').text("");
 	}
@@ -42,14 +58,12 @@ app.Middle = Backbone.View.extend({
   events: {
     'click #edit' : 'edit',
     'click #save' : 'save',
-	'click #previous' : 'previous'
+	'click #previous' : 'previous',
   },
   edit: function(){
-    console.log('Edit clicked!');
     app.router.navigate("/edit/"+app.textArea.id,true)
   },
   save: function(){
-    console.log('Save clicked! ');
 	//Check size is smaller than 10MB
 	if(encodeURIComponent(this.$el.find('#textbox').html()).replace(/%[A-F\d]{2}/g, 'U').length < 5000000){
 	    app.textArea = new app.TextArea({message: this.$el.find('#textbox').html(), oldId: app.textArea.get("messageId")});
@@ -64,18 +78,14 @@ app.Middle = Backbone.View.extend({
 	    });
 	}
 	else{
-		console.log('Too Large! ');
 		app.middle.msgTooLarge = true;
 		this.render();
 	}
   },
   previous: function(){
-    console.log('previous clicked!');
-    app.router.navigate("/id/"+app.textArea.get('oldId'),true)
+    app.router.navigate("/id/"+app.textArea.get('oldId'),true);
   },
-  
   doAction: function(){
-    console.log("doAction: "+window.filter);
     var box = this.$el.find('#textbox');
     app.textArea = new app.TextArea({messageId: window.filter[1]});
     var _thisView = this;
@@ -85,7 +95,6 @@ app.Middle = Backbone.View.extend({
 		_thisView.render();
         switch(window.filter[0]){
           case 'edit':
-            console.log("Editing...");
             box.attr('contentEditable',true);
 			if(app.textArea.get('oldId') != ""){
 				app.middle.$el.find('#previous').show();
@@ -96,7 +105,6 @@ app.Middle = Backbone.View.extend({
 			}
             break;   
           case 'id':
-            console.log("showing...");
             box.attr('contentEditable', false);
 			if(app.textArea.get('oldId') != ""){
 				app.middle.$el.find('#previous').show();
@@ -127,6 +135,7 @@ app.Router = Backbone.Router.extend({
 	'*filter'	: 'setFilter'
   },
   setFilter: function(params) {
+	console.log('app.router.params = ' + window.filter); 
     if(params != null){
 	  window.filter = params.trim().split('/') || [];
       console.log('app.router.params = ' + window.filter); // just for didactical purposes.
@@ -136,6 +145,7 @@ app.Router = Backbone.Router.extend({
 });
 
 app.router = new app.Router();
+app.title = new app.Title();
 app.middle = new app.Middle();
 Backbone.history.start();
 

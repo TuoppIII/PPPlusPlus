@@ -28,6 +28,11 @@ display: none;
 {
 color: #F00;
 }
+#title_button
+{
+font-size:30px;
+color: #FFF;
+}
 .inlinelist
 {
 display: inline;
