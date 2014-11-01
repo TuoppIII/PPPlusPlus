@@ -24,7 +24,6 @@ app.Title = Backbone.View.extend({
 		'click #title_button' : 'title_button'
 	},
 	title_button: function(){
-		console.log("title clicked");
 		app.middle.$el.find('#textbox').text("Insert text here!");
 		app.middle.$el.find('#previous').hide();
 		app.middle.$el.find('#feedback').text("");
@@ -93,7 +92,6 @@ app.Middle = Backbone.View.extend({
     var _thisView = this;
     app.textArea.fetch({
       success: function (model, response, options) {
-	     console.log("model: " + model + ", response: " + response + ", options: " + options);
 		_thisView.render();
         switch(window.filter[0]){
           case 'edit':
@@ -137,8 +135,8 @@ app.Router = Backbone.Router.extend({
 	'*filter'	: 'setFilter'
   },
   setFilter: function(params) {
-	console.log('app.router.params = ' + window.filter); 
     if(params != null){
+	  console.log('app.router.params = ' + window.filter); 
 	  window.filter = params.trim().split('/') || [];
       console.log('app.router.params = ' + window.filter); // just for didactical purposes.
       app.middle.doAction();
