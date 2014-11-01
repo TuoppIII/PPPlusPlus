@@ -4,7 +4,9 @@ var http = require('http'),
 	path = require('path');
     winston = require('winston'), 
 	journey = require('journey'),
-	Datastore = require('nedb');
+	Datastore = require('nedb'),
+	require('node-schedule');
+	
 
 /* Source: http://blog.nodejitsu.com/a-simple-webservice-in-nodejs/ */	
 /* Requires "winston" logger: npm install winston */
@@ -23,6 +25,22 @@ var http = require('http'),
 
 //var pastieMessages = new Array(); // Use standard object's associative array as message storage
 var messageDB = new Datastore({ filename: 'PiratedPastie.db', autoload: true });
+
+//Schedule a removal of old data everyday at 5am 
+var rule = new schedule.RecurrenceRule();
+rule.dayOfWeek = [0, new schedule.Range(1, 6)];
+rule.hour = 5;
+rule.minute = 0;
+
+var j = schedule.scheduleJob(rule, function(){
+    var removeOlder = new Date()
+	removeOlder.setDate(tst.getDate() - 30)
+	messageDB.remove( { messageID: { $lt: removeOlder}},{}, function (err, numRemoved) {
+		winston.info("removal found " + numRemoved + " document(s). " + err);
+		winston.info("removing...")
+	});
+});
+
 
 var contentTypesByExtension = {
 	'.html': "text/html",
@@ -137,7 +155,7 @@ exports.createRouter = function () {
 		messageDB.count({}, function (err, count) {
 			winston.info("Number of documents: " + count);
 		});
-		
+				
 		messageDB.find( { messageID: id }, function (err, docs) {
 			winston.info("found " + docs.length + " document(s). " + err);
 			winston.info("docs:" + docs + "/" + docs["messageID"]);
