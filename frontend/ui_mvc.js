@@ -4,7 +4,7 @@ var app = {}; // create namespace for our app
 app.TextArea = Backbone.Model.extend({
   defaults: {
 	"message": 'Insert text here!',
-	"created": '',
+	"created": Date.now(),
 	"oldId": '',
   },
   idAttribute:"messageId",
