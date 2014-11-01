@@ -1,11 +1,11 @@
 var http = require('http'),  
 	url = require('url'), 
 	fs = require('fs'),
-	path = require('path');
+	path = require('path'),
     winston = require('winston'), 
 	journey = require('journey'),
 	Datastore = require('nedb'),
-	require('node-schedule');
+	schedule = require('node-schedule');
 	
 
 /* Source: http://blog.nodejitsu.com/a-simple-webservice-in-nodejs/ */	
