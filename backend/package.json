@@ -13,6 +13,7 @@
 		"winston" : "*",
 		"journey" : "*",
 		"nedb" : "*",
-		"node-schedule" : "*"
+		"node-schedule" : "*",
+		"nconf" : "*"
 	}
 }

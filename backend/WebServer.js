@@ -2,16 +2,14 @@ var http = require('http'),
 	url = require('url'), 
 	fs = require('fs'),
 	path = require('path'),
-    winston = require('winston'), 
+	winston = require('winston'), 
 	journey = require('journey'),
 	Datastore = require('nedb'),
 	schedule = require('node-schedule');
+	config = require('nconf');
 	
-
-/* Source: http://blog.nodejitsu.com/a-simple-webservice-in-nodejs/ */	
-/* Requires "winston" logger: npm install winston */
-/* Requires "journey" router: npm install journey */
-/* Requires "nodejs-microdb": npm install nedb */
+/* Dependencies are handled by npm using package.json */
+/* Installation: npm install */
 
 /* Testable with http-console: 
 	npm install http-console
@@ -22,8 +20,6 @@ var http = require('http'),
 	http://localhost:3000/> get piratedpastie
 	http://localhost:3000/> get piratedpastie/0
 */
-
-var messageDB = new Datastore({ filename: 'PiratedPastie.db', autoload: true });
 
 var testobject = { name:'test', version:'1.0'};
 //winston.info( "object:" + testobject );
@@ -205,15 +201,24 @@ exports.createRouter = function () {
 
 /** Main code block start here **/
 
+// Configuration for the server
+config.argv()
+       .env()
+       .file({ file: 'piratedpastie.config' });
+
+winston.info("cleanup: " + config.get('cleanup-hour') + ":" + config.get('cleanup-minute') );
+
+var messageDB = new Datastore({ filename: config.get("database_name"), autoload: true });
+
 //Schedule a removal of old data everyday at 5am 
 rule.dayOfWeek = [0, new schedule.Range(1, 6)];
-rule.hour = 5;
-rule.minute = 0;
+rule.hour = config.get('cleanup-hour');
+rule.minute = config.get('cleanup-minute');
 
-var j = schedule.scheduleJob(rule, function(){
-    var removeOlder = new Date()
-	removeOlder.setDate(tst.getDate() - 30)
-	messageDB.remove( { messageID: { $lt: removeOlder}},{}, function (err, numRemoved) {
+var j = schedule.scheduleJob(rule, function() {
+	var removeOlder = new Date();
+	removeOlder.setDate( tst.getDate() - config.get( "cleanup-age" ) )
+	messageDB.remove( { created: { $lt: removeOlder}},{}, function (err, numRemoved) {
 		winston.info("removal found " + numRemoved + " document(s). " + err);
 		winston.info("removing...")
 	});
