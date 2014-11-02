@@ -217,7 +217,7 @@ rule.minute = config.get('cleanup-minute');
 
 var j = schedule.scheduleJob(rule, function() {
 	var removeOlder = new Date();
-	removeOlder.setDate( tst.getDate() - config.get( "cleanup-age" ) )
+	removeOlder.setDate( removeOlder.getDate() - config.get( "cleanup-age" ) )
 	messageDB.remove( { created: { $lt: removeOlder}},{}, function (err, numRemoved) {
 		winston.info("removal found " + numRemoved + " document(s). " + err);
 		winston.info("removing...")
