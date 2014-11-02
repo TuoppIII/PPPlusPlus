@@ -23,24 +23,12 @@ var http = require('http'),
 	http://localhost:3000/> get piratedpastie/0
 */
 
-//var pastieMessages = new Array(); // Use standard object's associative array as message storage
 var messageDB = new Datastore({ filename: 'PiratedPastie.db', autoload: true });
 
-//Schedule a removal of old data everyday at 5am 
+var testobject = { name:'test', version:'1.0'};
+//winston.info( "object:" + testobject );
+
 var rule = new schedule.RecurrenceRule();
-rule.dayOfWeek = [0, new schedule.Range(1, 6)];
-rule.hour = 5;
-rule.minute = 0;
-
-var j = schedule.scheduleJob(rule, function(){
-    var removeOlder = new Date()
-	removeOlder.setDate(tst.getDate() - 30)
-	messageDB.remove( { messageID: { $lt: removeOlder}},{}, function (err, numRemoved) {
-		winston.info("removal found " + numRemoved + " document(s). " + err);
-		winston.info("removing...")
-	});
-});
-
 
 var contentTypesByExtension = {
 	'.html': "text/html",
@@ -68,7 +56,6 @@ exports.createServer = function (port) {
 	  //
 	  // Dispatch the request to the router
 	  //
-	  //winston.info("body: " + body);
 	  winston.info( url.parse(request.url).pathname );
 	  
 	  if ( request.url.match(/piratedpastie/) ) {
@@ -77,8 +64,10 @@ exports.createServer = function (port) {
 			response.writeHead(result.status, result.headers);
 			response.end(result.body);
 		  });
+		  
 	  } else {
-		// Serve static html pages from ../frontend -directory
+
+		  // Serve static html pages from ../frontend -directory
 		var uri = url.parse(request.url).pathname
 			, filename = path.join(process.cwd(), '../frontend', uri);
 		
@@ -111,6 +100,7 @@ exports.createServer = function (port) {
 			});
 		});
 	  }
+	  
 	});
   });
   
@@ -129,11 +119,11 @@ exports.createRouter = function () {
       // LIST: GET to /bookmarks lists all bookmarks
       //
       this.get().bind(function (req, res) {
-		messageDB.find({}, function (err, docs) {
+		messageDB.find( {}, function (err, docs) {
 			winston.info("get, number of messages: " + docs.length);
 			var result = "";
 			for ( var doc in docs ) {
-				result += "" +docs[doc].messageID + ", ";
+				result += "" +docs[doc]._id + ", ";
 			}
 			if ( docs.length > 0 ) {
 				res.send(200, {}, { action: 'list', data: result} );
@@ -148,25 +138,26 @@ exports.createRouter = function () {
       // SHOW: GET to /bookmarks/:id shows the details of a specific bookmark 
       //
       this.get(/\/([\w|\d|\-|\_]+)/).bind(function (req, res, id) {
-		winston.info("get with id: " + id);
+		winston.info("get message with id: " + id);
 		
 		// Return message with given MessageId, if found.
-		
-		messageDB.count({}, function (err, count) {
-			winston.info("Number of documents: " + count);
-		});
-				
-		messageDB.find( { messageID: id }, function (err, docs) {
-			winston.info("found " + docs.length + " document(s). " + err);
-			winston.info("docs:" + docs + "/" + docs["messageID"]);
+		messageDB.find( { _id: id }, function (err, docs) {
+			winston.info("found " + docs.length + " document(s). Err: " + err);
 			for ( var doc in docs ) {
-				winston.info("doc:" + doc);
-				winston.info("found:" + docs[doc].length + "/" + docs[doc].messageID + "/" + docs[doc].text);
+				winston.info("found:" + docs[doc].length + "/" + docs[doc]._id + "/" + docs[doc].text);
 			}
 			if ( docs.length > 0 ) {
 				res.send(200, {}, { action: 'show', message: docs[0].text, created: docs[0].created, oldId: docs[0].oldId} );
 			} else {
-				res.send(404, {}, { action: 'show' } );
+				// Propably messgageID was used, test with that also
+				messageDB.find( { messageID: id }, function (err, docs) {
+					winston.info("found " + docs.length + " document(s) with messageID. Err: " + err);
+					if ( docs.length > 0 ) {
+						res.send(200, {}, { action: 'show', message: docs[0].text, created: docs[0].created, oldId: docs[0].oldId} );
+					} else {
+						res.send(404, {}, { action: 'show' } );
+					}
+				} );
 			}
 		});
 	  });
@@ -175,20 +166,14 @@ exports.createRouter = function () {
       // CREATE: POST to /bookmarks creates a new bookmark
       //
       this.post().bind(function (req, res, data) {
-		winston.info("post: " + req + "/" + res + "/" + data );
-		
-		for (var i in data) {
-			winston.info( "reg: " + i + "/" + data[i] );
-		}
-		
+				
 		// Save new message and return MessageID associated to it
-		var messageID = new Date().getTime(); // TODO There is a slight possibility for two messages to receive same ID. Use something unique from the request as part of the key as well?
 		var createdDate = new Date().getTime();
-		var message = { messageID: messageID, text: data.message, created: createdDate, oldId: data.oldId};
+		var message = { text: data.message, created: createdDate, oldId: data.oldId};
 		winston.info( "message: " + message ); 
 		messageDB.insert( message, function (err, newDoc) { 
-			winston.info("message saved with MessageID: " + newDoc.messageID + "/" + newDoc._id);
-			res.send(200, {}, { action: 'create', messageId: newDoc.messageID, id:  newDoc._id} );
+			winston.info("message saved with ID: " + newDoc._id);
+			res.send(200, {}, { action: 'create', messageId: newDoc._id, id:  newDoc._id} );
 		});
       });
 
@@ -218,8 +203,21 @@ exports.createRouter = function () {
 	return router;
 };
 
+/** Main code block start here **/
 
-var testobject = { name:'test', version:'1.0'};
-//winston.info( "object:" + testobject );
+//Schedule a removal of old data everyday at 5am 
+rule.dayOfWeek = [0, new schedule.Range(1, 6)];
+rule.hour = 5;
+rule.minute = 0;
+
+var j = schedule.scheduleJob(rule, function(){
+    var removeOlder = new Date()
+	removeOlder.setDate(tst.getDate() - 30)
+	messageDB.remove( { messageID: { $lt: removeOlder}},{}, function (err, numRemoved) {
+		winston.info("removal found " + numRemoved + " document(s). " + err);
+		winston.info("removing...")
+	});
+});
 
 exports.createServer(30001);
+
