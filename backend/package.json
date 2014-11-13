@@ -1,9 +1,9 @@
 {
 	"name" : "PiratedPastiePlusPlus",
 	"version" : "0.0.1",
-	"description" : "Web based copy & paste tool for teams for sharing text and images",
+	"description" : "Web based copy & paste tool for sharing text and images",
 	"scripts" : {
-		"start" : "nodejs WebServer.js"
+		"start" : "node WebServer.js"
 	},
 	"dependencies" : {
 		"http" : "*",
