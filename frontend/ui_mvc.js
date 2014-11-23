@@ -15,21 +15,21 @@ app.textArea = new app.TextArea();
 
 //Views
 app.Title = Backbone.View.extend({
-  el: $('#title'),
-  initialize: function(){
-    this.render();
-  },
-  render: function(){
-  },
-  events: {
-    'click #title_button' : 'title_button'
-  },
-  title_button: function(){
-    app.textArea.set('message',app.textArea.defaults.message);
-    app.middle.$el.find('#previous').hide();
-    app.middle.$el.find('#feedback').text("");
-    app.router.navigate("",true);
-  },
+	el: $('#title'),
+	initialize: function(){
+		this.render();
+	},
+	render: function(){
+	},
+	events: {
+		'click #title_button' : 'title_button'
+	},
+	title_button: function(){
+		app.textArea.set('message',app.textArea.defaults.message);
+		app.middle.$el.find('#previous').hide();
+		app.middle.$el.find('#feedback').text("");
+		app.router.navigate("",true);
+	},
 });
 
 app.TextBox = Backbone.View.extend({
@@ -38,57 +38,56 @@ app.TextBox = Backbone.View.extend({
 
   },
   render: function(){
-    if (app.textArea.get('language') == "plain_text"){
-      this.$el.html(app.textArea.get('message'));
-    }
-    else {
-      console.log("Render2")
-      variables = { 
-        language_class: app.textArea.get('language'), 
-        message: app.textArea.get('message'),
-      };
-      this.$el.html(_.template( $("#highlights").html(), variables ));
-      Prism.highlightAll();
-    }
+	if (app.textArea.get('language') == "plain_text"){
+		this.$el.val(app.textArea.get('message'));
+	}
+	else {
+		variables = { 
+			language_class: app.textArea.get('language'), 
+			message: app.textArea.get('message'),
+		};
+		this.$el.html(_.template( $("#highlights").html(), variables ));
+	}
   },
   getSize: function(){
-    return this.$el.html().replace(/%[A-F\d]{2}/g, 'U').length;
+	return this.$el.html().replace(/%[A-F\d]{2}/g, 'U').length;
   },
 });
 
 app.MiddleBottom = Backbone.View.extend({
-  el: $('#middle-bottom'),
-  initialize: function(){
-  },
-  render: function(){
-    this.$el.find('#last_edited').text( "Last edited: " + 
-      new Date(app.textArea.get('created')).toLocaleDateString() + " " + new Date(app.textArea.get('created')).toLocaleTimeString() );
-  },
-  events: {
-    'click #edit' : 'edit',
-    'click #save' : 'save',	
-  },
-  edit: function(){
-    app.router.navigate("/edit/"+app.textArea.id,true);
-  },
-  save: function(){
-    //Check size is smaller than 10MB
-    if(encodeURIComponent(textbox.getSize < 5000000)){
-      app.textArea = new app.TextArea({message: app.middle.textbox.$el.text(), oldId: app.textArea.get("messageId")});
-      app.textArea.save({message: app.textArea.get('message')},{
-        success: function (model, response, options) {
-          app.middle.justSaved = true;
-          app.router.navigate("/id/"+app.textArea.get('messageId'),true)
-        },
-        error: function (model, response, options) {
-          app.textArea.set('message',"Failed to save text to server!!\n\n"+ app.textArea.get('message'));
-        },
-      });
-    }
-    else{
-      app.middle.msgTooLarge = true;
-      app.middle.render();
-    }
+	el: $('#middle-bottom'),
+	initialize: function(){
+	},
+	render: function(){
+		this.$el.find('#last_edited').text( "Last edited: " + 
+		new Date(app.textArea.get('created')).toLocaleDateString() + " " + new Date(app.textArea.get('created')).toLocaleTimeString() );
+    },
+	events: {
+	  'click #edit' : 'edit',
+	  'click #save' : 'save',	
+	},
+	edit: function(){
+	  app.textArea.get('language') = "plain_text"
+      app.router.navigate("/edit/"+app.textArea.id,true);
+    },
+    save: function(){
+	  //Check size is smaller than 5MB
+	  if(encodeURIComponent(textbox.getSize < 5000000)){
+	    app.textArea = new app.TextArea({message: textbox.$el.html(), oldId: app.textArea.get("messageId")});
+	    app.textArea.save({message: app.textArea.get('message')},{
+	    	success: function (model, response, options) {
+			app.middle.justSaved = true;
+			app.router.navigate("/id/"+app.textArea.get('messageId'),true)
+	    	},
+			error: function (model, response, options) {
+       	 		app.textArea.set('message',"Failed to save text to server!!\n\n"+ app.textArea.get('message'));
+	    	},
+	    });
+	  }
+	  else{
+		app.middle.msgTooLarge = true;
+		app.middle.render();
+	  }
   },
 })
 
@@ -102,23 +101,24 @@ app.Middle = Backbone.View.extend({
     this.middleBottom = new app.MiddleBottom(),
     this.render();
   },
-  render: function(){
-    this.$el.append(this.textbox.$el);
-    this.$el.append(this.middleBottom.$el);
-    this.textbox.render();
-    this.middleBottom.render();
-    if(!this.justSaved && !this.msgTooLarge){
-      this.$el.find('#feedback').text("");
-    }
-    else if(this.justSaved){
-      this.$el.find('#feedback').text("Save successful! Text id: " + app.textArea.get('messageId'));
-      this.justSaved = false;
-    }
-    else if(this.msgTooLarge){
-      this.$el.find('#error').text("Message size too large. Allowed size 5Mb." );
-      this.msgTooLarge = false;
-    }
-    this.$el.find('#previous').val(app.textArea.get('oldId'));
+  render: function(){	
+  this.$el.append(this.textbox.$el);
+  this.$el.append(this.middleBottom.$el);
+  this.textbox.render();
+  this.middleBottom.render();
+	if(!this.justSaved && !this.msgTooLarge){
+		this.$el.find('#feedback').text("");
+	}
+	else if(this.justSaved){
+		this.$el.find('#feedback').text("Save successful! Text id: " + app.textArea.get('messageId'));
+		Prism.highlightAll();
+		this.justSaved = false;
+	}
+	else if(this.msgTooLarge){
+		this.$el.find('#error').text("Message size too large. Allowed size 5Mb." );
+		this.msgTooLarge = false;
+	}
+	this.$el.find('#previous').val(app.textArea.get('oldId'));
   },
   events: {
     'click #previous' : 'previous',
