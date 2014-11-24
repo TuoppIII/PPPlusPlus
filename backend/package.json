@@ -3,7 +3,7 @@
 	"version" : "0.0.1",
 	"description" : "Web based copy & paste tool for sharing text and images",
 	"scripts" : {
-		"start" : "node WebServer.js"
+		"start" : "nodejs WebServer.js"
 	},
 	"dependencies" : {
 		"http" : "*",
