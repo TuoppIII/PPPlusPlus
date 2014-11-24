@@ -33,15 +33,16 @@ color: #F00;
 font-size:30px;
 color: #FFF;
 }
+#language_selector
+{
+color: #000;
+float: right;
+margin-bottom: 10px;
+}
 .inlinelist
 {
 display: inline;
 list-style-type: none;
-}
-.buttons
-{
-width: 200px;
-margin-left: auto;
 }
 
 .fill { 
