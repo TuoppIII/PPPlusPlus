@@ -143,7 +143,7 @@ exports.createRouter = function () {
 				winston.info("found:" + docs[doc].length + "/" + docs[doc]._id );
 			}
 			if ( docs.length > 0 ) {
-				res.send(200, {}, { action: 'show', message: docs[0].text, created: docs[0].created, oldId: docs[0].oldId} );
+				res.send(200, {}, { action: 'show', message: docs[0].text, created: docs[0].created, oldId: docs[0].oldId, language: docs[0].language} );
 			} else {
 				// Propably messgageID was used, test with that also
 				messageDB.find( { messageID: id }, function (err, docs) {
@@ -165,7 +165,7 @@ exports.createRouter = function () {
 				
 		// Save new message and return MessageID associated to it
 		var createdDate = new Date().getTime();
-		var message = { text: data.message, created: createdDate, oldId: data.oldId};
+		var message = { text: data.message, created: createdDate, oldId: data.oldId, language: data.language};
 		winston.info( "message: " + data.message + " / message size: " + data.message.length ); 
 		if ( data.message.length > config.get("max_message_size") ) {
 			// Too big message, discard and give error 507 - Insufficient Storage
