@@ -140,7 +140,7 @@ exports.createRouter = function () {
 		messageDB.find( { _id: id }, function (err, docs) {
 			winston.info("found " + docs.length + " document(s). Err: " + err);
 			for ( var doc in docs ) {
-				winston.info("found:" + docs[doc].length + "/" + docs[doc]._id + "/" + docs[doc].text);
+				winston.info("found:" + docs[doc].length + "/" + docs[doc]._id );
 			}
 			if ( docs.length > 0 ) {
 				res.send(200, {}, { action: 'show', message: docs[0].text, created: docs[0].created, oldId: docs[0].oldId} );
@@ -166,11 +166,18 @@ exports.createRouter = function () {
 		// Save new message and return MessageID associated to it
 		var createdDate = new Date().getTime();
 		var message = { text: data.message, created: createdDate, oldId: data.oldId};
-		winston.info( "message: " + message ); 
-		messageDB.insert( message, function (err, newDoc) { 
-			winston.info("message saved with ID: " + newDoc._id);
-			res.send(200, {}, { action: 'create', messageId: newDoc._id, id:  newDoc._id} );
-		});
+		winston.info( "message: " + data.message + " / message size: " + data.message.length ); 
+		if ( data.message.length > config.get("max_message_size") ) {
+			// Too big message, discard and give error 507 - Insufficient Storage
+			res.send( 507, {}, {} );
+			winston.warn("Message too big and not save: " + data.message.length);
+		} else {
+			// Message size OK, save it
+			messageDB.insert( message, function (err, newDoc) { 
+				winston.info("message saved with ID: " + newDoc._id);
+				res.send(201, {}, { action: 'create', messageId: newDoc._id, id:  newDoc._id} );
+			});
+		}
       });
 
       //
@@ -206,9 +213,13 @@ config.argv()
        .env()
        .file({ file: 'piratedpastie.config' });
 
-winston.info("cleanup: " + config.get('cleanup-hour') + ":" + config.get('cleanup-minute') );
+winston.info("cleanup time: " + config.get('cleanup-hour') + ":" + config.get('cleanup-minute') );
 
 var messageDB = new Datastore({ filename: config.get("database_name"), autoload: true });
+messageDB.find( {}, function (err, docs) {
+	winston.info("Loaded database with " + docs.length + " record(s). " );
+} );
+
 
 //Schedule a removal of old data everyday at 5am 
 rule.dayOfWeek = [0, new schedule.Range(1, 6)];
@@ -221,6 +232,7 @@ var j = schedule.scheduleJob(rule, function() {
 	messageDB.remove( { created: { $lt: removeOlder}},{}, function (err, numRemoved) {
 		winston.info("removal found " + numRemoved + " document(s). " + err);
 		winston.info("removing...")
+		messageDB.persistence.compactDatafile (); // Compacts datafile after old records have been removed
 	});
 });
 
