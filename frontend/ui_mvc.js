@@ -26,6 +26,8 @@ app.Title = Backbone.View.extend({
 	},
 	title_button: function(){
 		app.textArea.set('message',app.textArea.defaults.message);
+		app.textArea.set('language', app.textArea.defaults.language)
+		app.middle.$el.find('#language_selector').val(app.textArea.defaults.language)
 		app.middle.$el.find('#previous').hide();
 		app.middle.$el.find('#feedback').text("");
 		app.router.navigate("",true);
@@ -39,7 +41,7 @@ app.TextBox = Backbone.View.extend({
   },
   render: function(){
 	if (app.textArea.get('language') == "plain_text"){
-		this.$el.val(app.textArea.get('message'));
+		this.$el.html(app.textArea.get('message'));
 	}
 	else {
 		variables = { 
@@ -47,6 +49,7 @@ app.TextBox = Backbone.View.extend({
 			message: app.textArea.get('message'),
 		};
 		this.$el.html(_.template( $("#highlights").html(), variables ));
+		Prism.highlightAll();
 	}
   },
   getSize: function(){
@@ -67,16 +70,18 @@ app.MiddleBottom = Backbone.View.extend({
 	  'click #save' : 'save',	
 	},
 	edit: function(){
-	  app.textArea.get('language') = "plain_text"
       app.router.navigate("/edit/"+app.textArea.id,true);
     },
     save: function(){
-	  //Check size is smaller than 5MB
-	  if(encodeURIComponent(textbox.getSize < 5000000)){
-	    app.textArea = new app.TextArea({message: textbox.$el.html(), oldId: app.textArea.get("messageId")});
+	  //Check size is smaller than 5M
+	  if(encodeURIComponent(app.middle.textbox.getSize < 5000000)){
+		app.textArea.set('language',app.middle.$el.find('#language_selector').val());
+	    app.textArea = new app.TextArea({message: app.middle.textbox.$el.html().split('<br>').join('\n'), oldId: app.textArea.get("messageId"), language: app.textArea.get('language')});
 	    app.textArea.save({message: app.textArea.get('message')},{
 	    	success: function (model, response, options) {
 			app.middle.justSaved = true;
+			save.disabled = true;
+			edit.disabled = false;
 			app.router.navigate("/id/"+app.textArea.get('messageId'),true)
 	    	},
 			error: function (model, response, options) {
@@ -111,7 +116,6 @@ app.Middle = Backbone.View.extend({
 	}
 	else if(this.justSaved){
 		this.$el.find('#feedback').text("Save successful! Text id: " + app.textArea.get('messageId'));
-		Prism.highlightAll();
 		this.justSaved = false;
 	}
 	else if(this.msgTooLarge){
@@ -122,25 +126,12 @@ app.Middle = Backbone.View.extend({
   },
   events: {
     'click #previous' : 'previous',
-    'change #language_selector': 'languageSelected',
     'focus #textbox' : 'focus',
   },
   focus: function(){
     if(this.textbox.$el.html() == app.textArea.defaults.message && Backbone.history.fragment.length == 0){
       this.textbox.$el.html(''); 
     }
-  },
-  languageSelected: function() {
-    app.textArea.set('language',this.$el.find('#language_selector').val());
-    if(app.textArea.get('language') == "plain_text"){
-      app.textArea.set("message",this.textbox.$el.html());
-    }
-    else{
-      app.textArea.set("message",this.textbox.$el.html());
-    }
-
-    this.textbox.$el.attr('contentEditable', false);
-    this.render();
   },
   previous: function(){
     app.router.navigate("/id/"+app.textArea.get('oldId'),true);
@@ -150,10 +141,13 @@ app.Middle = Backbone.View.extend({
     var _thisView = this;
     app.textArea.fetch({
       success: function (model, response, options) {
-        _thisView.render();
           switch(window.filter[0]){
             case 'edit':
               _thisView.textbox.$el.attr('contentEditable',true);
+    		  save.disabled = false;
+			  edit.disabled = true;
+			  app.textArea.set('language', app.textArea.defaults.language);
+			  app.textArea.set('message',app.textArea.get('message').split('\n').join('<br>'));
               if(app.textArea.get('oldId') != ""){
                 app.middle.$el.find('#previous').show();
               }
@@ -163,6 +157,9 @@ app.Middle = Backbone.View.extend({
               break;   
             case 'id':
               _thisView.textbox.$el.attr('contentEditable', false);
+			  save.disabled = true;
+			  edit.disabled = false;
+			  _thisView.$el.find('#language_selector').val(app.textArea.get('language'));
               if(app.textArea.get('oldId') != ""){
                 app.middle.$el.find('#previous').show();
               }
@@ -173,6 +170,7 @@ app.Middle = Backbone.View.extend({
             default:
               break;
           }
+		  _thisView.render();
       },
       error: function (model, response, options) {
         app.textArea.set('message',"Failed to retrieve text with id: "+app.textArea.id+"!");
@@ -198,6 +196,8 @@ app.Router = Backbone.Router.extend({
     }
     else{
       app.middle.textbox.$el.attr('contentEditable', true);
+	  save.disabled = false;
+	  edit.disabled = true;
       app.middle.render();
     }
   }
