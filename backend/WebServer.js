@@ -166,7 +166,7 @@ exports.createRouter = function () {
 		// Save new message and return MessageID associated to it
 		var createdDate = new Date().getTime();
 		var message = { text: data.message, created: createdDate, oldId: data.oldId, language: data.language};
-		winston.info( "message: " + data.message + " / message size: " + data.message.length ); 
+		winston.info( "message size: " + data.message.length ); 
 		if ( data.message.length > config.get("max_message_size") ) {
 			// Too big message, discard and give error 507 - Insufficient Storage
 			res.send( 507, {}, {} );
