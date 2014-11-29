@@ -1,4 +1,9 @@
 var app = {}; // create namespace for our app
+app.error = []; //Array for generic error messages
+
+//generic errors
+app.error["too_large"] = "Message size too large. Allowed size 5Mb!";
+app.error["failed_save"] = "Failed to save text to server!!";
 
 //Models
 app.TextArea = Backbone.Model.extend({
@@ -25,6 +30,7 @@ app.Title = Backbone.View.extend({
 		'click #title_button' : 'title_button'
 	},
 	title_button: function(){
+		//When clicking on page title then go to root url and clean all to defaults
 		app.textArea.set('message',app.textArea.defaults.message);
 		app.textArea.set('language', app.textArea.defaults.language)
 		app.middle.$el.find('#language_selector').val(app.textArea.defaults.language)
@@ -34,19 +40,21 @@ app.Title = Backbone.View.extend({
 	},
 });
 
+//The actual textarea
 app.TextBox = Backbone.View.extend({
   el: $('#textbox'),
   initialize: function(){
 
   },
   render: function(){
+	//If using highlights then use template and Prism highlight. Otherwise just show plain text
 	if (app.textArea.get('language') == "plain_text"){
 		this.$el.html(app.textArea.get('message'));
 	}
 	else {
 		variables = { 
 			language_class: app.textArea.get('language'), 
-			message: app.textArea.get('message'),
+			message: app.textArea.get('message').split('<br>').join('\n'),
 		};
 		this.$el.html(_.template( $("#highlights").html(), variables ));
 		Prism.highlightAll();
@@ -76,7 +84,8 @@ app.MiddleBottom = Backbone.View.extend({
 	  //Check size is smaller than 5M
 	  if(encodeURIComponent(app.middle.textbox.getSize < 5000000)){
 		app.textArea.set('language',app.middle.$el.find('#language_selector').val());
-	    app.textArea = new app.TextArea({message: app.middle.textbox.$el.html().split('<br>').join('\n'), oldId: app.textArea.get("messageId"), language: app.textArea.get('language')});
+		//Instead of using put for edited text just create a new textarea object with oldId attribute. Essentially it is a new object anyway. 
+	    app.textArea = new app.TextArea({message: app.middle.textbox.$el.html(), oldId: app.textArea.get("messageId"), language: app.textArea.get('language')});
 	    app.textArea.save({message: app.textArea.get('message')},{
 	    	success: function (model, response, options) {
 			app.middle.justSaved = true;
@@ -85,7 +94,12 @@ app.MiddleBottom = Backbone.View.extend({
 			app.router.navigate("/id/"+app.textArea.get('messageId'),true)
 	    	},
 			error: function (model, response, options) {
-       	 		app.textArea.set('message',"Failed to save text to server!!\n\n"+ app.textArea.get('message'));
+				if(response.status == 507){
+					app.middle.$el.find('#error').text(app.error.too_large);
+				}
+				else{
+					app.middle.$el.find('#error').text(app.error.failed_save);
+				}
 	    	},
 	    });
 	  }
@@ -107,10 +121,12 @@ app.Middle = Backbone.View.extend({
     this.render();
   },
   render: function(){	
-  this.$el.append(this.textbox.$el);
-  this.$el.append(this.middleBottom.$el);
-  this.textbox.render();
-  this.middleBottom.render();
+	//Connect the two subviews to this view
+	this.$el.append(this.textbox.$el);
+	this.$el.append(this.middleBottom.$el);
+	this.textbox.render();
+	this.middleBottom.render();
+	//check if saving the pastie had errors. 
 	if(!this.justSaved && !this.msgTooLarge){
 		this.$el.find('#feedback').text("");
 	}
@@ -119,9 +135,10 @@ app.Middle = Backbone.View.extend({
 		this.justSaved = false;
 	}
 	else if(this.msgTooLarge){
-		this.$el.find('#error').text("Message size too large. Allowed size 5Mb." );
+		this.$el.find('#error').text(app.error.too_large);
 		this.msgTooLarge = false;
 	}
+	//set the link to previous version
 	this.$el.find('#previous').val(app.textArea.get('oldId'));
   },
   events: {
@@ -129,6 +146,7 @@ app.Middle = Backbone.View.extend({
     'focus #textbox' : 'focus',
   },
   focus: function(){
+	//When focusing in the root url then clean the default text. I bet this could be done easier.
     if(this.textbox.$el.html() == app.textArea.defaults.message && Backbone.history.fragment.length == 0){
       this.textbox.$el.html(''); 
     }
@@ -136,8 +154,11 @@ app.Middle = Backbone.View.extend({
   previous: function(){
     app.router.navigate("/id/"+app.textArea.get('oldId'),true);
   },
+  //when going to #/edit/{id} or #/id/{id} url the magick happens underneath
   doAction: function(){
+	//get the id filter
     app.textArea = new app.TextArea({messageId: window.filter[1]});
+	//instantiate this view so we can use it in save & error functions when necessary
     var _thisView = this;
     app.textArea.fetch({
       success: function (model, response, options) {
@@ -147,7 +168,7 @@ app.Middle = Backbone.View.extend({
     		  save.disabled = false;
 			  edit.disabled = true;
 			  app.textArea.set('language', app.textArea.defaults.language);
-			  app.textArea.set('message',app.textArea.get('message').split('\n').join('<br>'));
+			  app.textArea.set('message',app.textArea.get('message'));
               if(app.textArea.get('oldId') != ""){
                 app.middle.$el.find('#previous').show();
               }
