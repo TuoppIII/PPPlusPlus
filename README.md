@@ -1,4 +1,4 @@
-Pirate Pastie++ 
+Welcome to Pirate Pastie++ 
 
 Pirate Pastie++ is a tool for sharing content between different computers 
 like you would use clipboard. The user can copy & paste content, including images, 
