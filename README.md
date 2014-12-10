@@ -16,3 +16,13 @@ Setting up server:
 4. Run server with npm start
 5. Browse to Pirate Pastie++ start page, default is "http://localhost:30001/"
 6. Enjoy!
+
+
+Plans for unforeseen future:
+1. Clean up based on DB size.
+2. Full version history shown on every memo
+3. Tooltip to Pirate Pastie -logo, which shows that logo jumps to
+back to start page
+4. Code highlight with images. Currently code highlight will strip
+images from the code.
+
