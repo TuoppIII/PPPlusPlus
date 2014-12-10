@@ -1,19 +1,23 @@
 {
-	"name" : "PiratedPastiePlusPlus",
-	"version" : "0.0.1",
-	"description" : "Web based copy & paste tool for sharing text and images",
-	"scripts" : {
-		"start" : "nodejs WebServer.js"
-	},
-	"dependencies" : {
-		"http" : "*",
-		"url" : "*",
-		"fs" : "*",
-		"path" : "*",
-		"winston" : "*",
-		"journey" : "*",
-		"nedb" : "*",
-		"node-schedule" : "*",
-		"nconf" : "*"
-	}
+  "name": "PiratedPastiePlusPlus",
+  "version": "0.0.1",
+  "description": "Web based copy & paste tool for sharing text and images",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TuoppIII/PPPlusPlus/"
+  },
+  "scripts": {
+    "start": "node WebServer.js"
+  },
+  "dependencies": {
+    "http": "*",
+    "url": "*",
+    "fs": "*",
+    "path": "*",
+    "winston": "*",
+    "journey": "*",
+    "nedb": "~1.0.0",
+    "node-schedule": "*",
+    "nconf": "~0.7.1"
+  }
 }
