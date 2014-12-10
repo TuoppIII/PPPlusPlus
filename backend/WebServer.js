@@ -236,5 +236,5 @@ var j = schedule.scheduleJob(rule, function() {
 	});
 });
 
-exports.createServer(30001);
+exports.createServer( config.get( "server_port" ) );
 
