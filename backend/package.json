@@ -10,14 +10,15 @@
     "start": "node WebServer.js"
   },
   "dependencies": {
-    "http": "*",
-    "url": "*",
+    "express": "^4.16.2",
     "fs": "*",
-    "path": "*",
-    "winston": "*",
-    "journey": "*",
-    "nedb": "~1.0.0",
+    "http": "*",
+    "journey": "^0.3.1",
+    "nconf": "^0.8.5",
+    "nedb": "^1.8.0",
     "node-schedule": "*",
-    "nconf": "~0.7.1"
+    "path": "*",
+    "url": "*",
+    "winston": "*"
   }
 }
